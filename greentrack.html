@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GreenTrack AI</title>
+<meta name="description" content="Pitch GreenTrack AI — l'IA qui prévoit la soif de chaque plante et arrose juste à temps. Équipe Squad Nova.">
+<link rel="alternate" hreflang="en" href="greentrack-en.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1E1E1E;--card:#2A2A2A;--card2:#333333;--ink:#F2EFEA;--mute:#A8A4A0;--line:#4A4A4A;--acc:#3DBB6B;--shell:#121212}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--shell);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.viewport{position:fixed;left:0;right:0;top:0;bottom:0;transition:bottom .3s}
+body.notes-open .viewport{bottom:var(--notes-h)}
+.deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center center;background:var(--bg);overflow:hidden;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.slide{position:absolute;inset:0;padding:76px 96px 90px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateX(28px);transition:opacity .45s ease,transform .45s ease,visibility .45s}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-28px)}
+.slide h2{font-size:60px;line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 52px;max-width:1408px;text-wrap:balance}
+.slide .body{flex:1;min-height:0;display:flex;flex-direction:column}
+.foot{position:absolute;left:96px;right:96px;bottom:34px;display:flex;justify-content:space-between;font-size:20px;color:var(--mute);letter-spacing:.02em}
+.foot b{color:var(--ink);font-weight:600}
+.progress{position:absolute;left:0;bottom:0;height:5px;background:var(--acc);transition:width .45s ease}
+p{margin:0}
+.mute{color:var(--mute)} .acc{color:var(--acc)}
+.card{background:var(--card);border-radius:26px;padding:42px 44px;position:relative}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:36px;flex:1}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1}
+.card h3{font-size:40px;line-height:1.12;margin:0 0 18px;font-weight:700;letter-spacing:-.01em}
+.label{font-size:26px;font-weight:700;color:var(--acc);letter-spacing:.01em;margin-bottom:14px}
+.tag{font-size:22px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.txt{font-size:34px;line-height:1.3}
+.small{font-size:28px;line-height:1.35}
+.num{flex:none;width:68px;height:68px;border-radius:50%;background:var(--acc);color:#1E1E1E;font-weight:800;font-size:32px;display:grid;place-items:center}
+.task{margin-top:auto;padding-top:36px;font-size:36px;line-height:1.3;max-width:1380px}
+.task b{color:var(--acc)}
+/* title slide */
+.title-slide{justify-content:center;padding-top:60px}
+.title-slide h1{font-size:132px;line-height:1;margin:0 0 40px;font-weight:800;letter-spacing:-.045em}
+.title-slide h1 span{color:var(--acc)}
+.title-slide .lead{font-size:36px;line-height:1.4;color:var(--mute);max-width:960px}
+.title-slide .lead b{color:var(--ink);font-weight:600}
+.title-row{display:flex;align-items:center;gap:28px;margin-top:64px}
+.pill{background:var(--acc);color:#1E1E1E;font-weight:800;font-size:28px;padding:16px 34px;border-radius:99px}
+.team{font-size:32px;font-weight:600}
+.title-art{position:absolute;right:0;top:0;bottom:0;width:440px;opacity:.9;pointer-events:none}
+/* quote */
+.quote{font-size:48px;line-height:1.28;font-style:italic;font-weight:500;letter-spacing:-.01em}
+.quote .qm{color:var(--acc);font-style:normal;font-weight:800}
+.who{display:flex;align-items:center;gap:26px;margin-top:40px}
+.avatar{flex:none;width:120px;height:120px;border-radius:50%;border:3px dashed var(--line);display:grid;place-items:center;font-size:20px;color:var(--mute);text-align:center;line-height:1.2}
+.who .name{font-size:30px;font-weight:700}
+.who .role{font-size:26px;color:var(--mute)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;flex:1;align-items:center}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr;align-items:stretch}
+.pipe .card{display:flex;flex-direction:column;padding:28px 34px}
+.pipe .arrow{display:grid;place-items:center}
+.pipe svg.mini{width:100%;height:120px;margin:4px 0 14px}
+.pipe h3{font-size:36px;margin:0 0 10px}
+.pipe .small{color:var(--mute)}
+/* challenge rows */
+.rows{display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center}
+.row{display:grid;grid-template-columns:68px 1fr 60px 1.15fr;align-items:center;gap:30px;background:var(--card);border-radius:26px;padding:30px 40px}
+.row .pb{font-size:34px;font-weight:700;line-height:1.2}
+.row .pb small{display:block;font-size:26px;font-weight:400;color:var(--mute);margin-top:6px}
+.row .ans{font-size:30px;line-height:1.3}
+.row .ans b{color:var(--acc);display:block;font-size:22px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.heads{display:grid;grid-template-columns:68px 1fr 60px 1.15fr;gap:30px;padding:0 40px;margin-bottom:-6px}
+/* lists */
+ul.dots{list-style:none;padding:0;margin:0}
+ul.dots li{font-size:34px;line-height:1.3;padding-left:40px;position:relative;margin-bottom:22px}
+ul.dots li:before{content:"";position:absolute;left:4px;top:.5em;width:14px;height:14px;border-radius:50%;background:var(--acc)}
+ul.dots.off li{color:var(--mute)}
+ul.dots.off li:before{background:transparent;border:2px solid var(--line);top:.45em}
+/* stats */
+.stat{font-size:112px;white-space:nowrap;font-weight:800;letter-spacing:-.045em;line-height:1;margin-bottom:22px}
+.stat.acc{color:var(--acc)}
+.note-line{margin-top:30px;font-size:26px;color:var(--mute);font-style:italic}
+/* timeline */
+.later{display:grid;grid-template-columns:5fr 7fr;gap:52px;flex:1}
+.tl{position:relative;display:flex;flex-direction:column;gap:22px}
+.tl:before{content:"";position:absolute;left:33px;top:40px;bottom:60px;width:3px;background:var(--line)}
+.step{display:grid;grid-template-columns:68px 1fr;gap:28px;align-items:start;position:relative}
+.step .dot{width:68px;height:68px;border-radius:50%;border:3px solid var(--line);background:var(--bg);display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--mute)}
+.step .box{padding:20px 0}
+.step .box p{font-size:30px;line-height:1.3;color:var(--mute);margin-top:6px}
+.step.on .dot{background:var(--acc);border-color:var(--acc);color:#1E1E1E}
+.step.on .box{background:var(--card);border:3px solid var(--acc);border-radius:22px;padding:22px 30px}
+.step.on .tag{color:var(--acc)}
+.step.on .box p{color:var(--ink);font-weight:700;font-size:34px}
+/* chrome */
+.controls{position:fixed;right:20px;bottom:20px;display:flex;gap:8px;align-items:center;background:rgba(30,30,30,.92);border:1px solid #333;border-radius:14px;padding:6px;transition:opacity .3s,bottom .3s;z-index:5;font-size:15px}
+body.notes-open .controls{bottom:calc(var(--notes-h) + 20px)}
+body.idle .controls{opacity:0}
+.controls button{background:transparent;color:var(--ink);border:0;font:inherit;font-weight:600;padding:9px 13px;border-radius:9px;cursor:pointer}
+.controls button:hover,.controls button:focus-visible{background:#333;outline:none}
+.controls a.lang{color:var(--ink);text-decoration:none;font-weight:700;padding:9px 13px;border-radius:9px;border:1px solid #444}
+.controls a.lang:hover,.controls a.lang:focus-visible{background:#333;outline:none}
+.controls .count{color:var(--mute);min-width:56px;text-align:center;font-variant-numeric:tabular-nums}
+.notes{position:fixed;left:0;right:0;bottom:0;height:var(--notes-h);background:#181818;border-top:1px solid #333;transform:translateY(100%);transition:transform .3s;padding:18px 28px;overflow:auto;z-index:4}
+body.notes-open .notes{transform:none}
+.notes header{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.notes header .timer{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:0}
+.notes .who-speaks{color:var(--acc);font-weight:700;font-size:18px;margin-bottom:6px}
+.notes .ntext{font-size:18px;line-height:1.55;white-space:pre-line;max-width:1100px}
+.slide aside{display:none}
+.help{position:fixed;left:20px;bottom:20px;font-size:13px;color:#777;transition:opacity .3s;z-index:3}
+body.idle .help,body.notes-open .help{opacity:0}
+@media (prefers-reduced-motion:reduce){.slide,.progress,.viewport,.notes,.controls{transition:none}}
+@page{size:1600px 900px;margin:0}
+@media print{
+  html,body{overflow:visible;height:auto;background:var(--bg)}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .viewport{position:static}
+  .deck{position:static;transform:none!important;width:1600px;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;height:900px;break-after:page;transition:none}
+  .controls,.notes,.progress,.help{display:none}
+}
+</style>
+<style>:root{--notes-h:34vh}</style>
+</head>
+<body>
+<main class="viewport">
+<div class="deck" role="region" aria-roledescription="présentation" aria-label="GreenTrack AI">
+<section class="slide title-slide" aria-label="Slide 1"><svg class="title-art" viewBox="0 0 640 900" aria-hidden="true">
+ <line x1="20" y1="560" x2="640" y2="560" stroke="#3A3A3A" stroke-width="4" stroke-dasharray="6 14"/>
+ <path d="M20 330 L150 520 L150 300 L300 540 L300 290 L450 530 L450 300 L640 520" fill="none" stroke="#2E2E2E" stroke-width="12" stroke-linejoin="round"/>
+ <path d="M20 330 L150 420 L150 360 L330 480 L470 548 L470 380 L640 470" fill="none" stroke="#3DBB6B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle cx="470" cy="548" r="18" fill="#3DBB6B"/>
+ <g fill="#5B7A99"><path d="M560 160c0 0-34 40-34 64a34 34 0 0 0 68 0c0-24-34-64-34-64z" opacity=".8"/></g>
+</svg>
+<h1>GreenTrack <span>AI</span></h1>
+<p class="lead">Dans les espaces verts du Bénin, on arrose à heures fixes, qu'il ait plu ou non. GreenTrack AI <b>prévoit, plante par plante, quand le sol va manquer d'eau</b>, et arrose <b>juste à temps et juste ce qu'il faut</b> — ou pas du tout si la pluie arrive.</p>
+<div class="title-row"><span class="pill">Prototype · Bénin</span><span class="team">Équipe Squad Nova</span></div><aside>Membre 1 — 20 s
+Bonjour, nous sommes l'équipe Squad Nova. Notre projet s'appelle GreenTrack AI.
+Lire la phrase centrale lentement, en regardant le jury.
+Transition : « Laissez-nous vous présenter Afi. »</aside></section>
+<section class="slide " aria-label="Slide 2"><h2>Arroser à heures fixes gaspille l'eau et oublie des plantes</h2>
+<div class="split">
+ <div>
+  <p class="quote"><span class="qm">« </span>J'arrose tout le parc chaque matin, même quand il a plu la nuit. Les arbres du fond, je n'ai jamais le temps d'y aller.<span class="qm"> »</span></p>
+  <div class="who"><div class="avatar">photo<br>à venir</div><div><div class="name">Afi, agente d'entretien</div><div class="role">Place des Amazones, Cotonou</div></div></div>
+ </div>
+ <div><svg viewBox="0 0 760 600" width="100%" role="img" aria-label="Exemple : une semaine d'arrosage fixe, 40 litres chaque jour, dont deux jours de pluie">
+ <defs><pattern id="lost" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#3A3A3A"/><line x1="0" y1="0" x2="0" y2="16" stroke="#555" stroke-width="7"/></pattern></defs>
+ <rect width="760" height="600" rx="26" fill="#2A2A2A"/>
+ <text x="40" y="58" font-size="26" font-weight="700" fill="#F2EFEA">Arrosage fixe, une semaine</text>
+ <text x="720" y="58" text-anchor="end" font-size="20" fill="#A8A4A0" font-style="italic">exemple</text>
+ <rect x="70" y="230" width="58" height="210" rx="10" fill="#F2EFEA"/><text x="99" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">40 L</text><text x="99" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">L</text><rect x="165" y="230" width="58" height="210" rx="10" fill="url(#lost)"/><text x="194" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#A8A4A0">40 L</text><text x="194" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">M</text><g transform="translate(194,120)"><circle cx="-16" cy="0" r="18" fill="#5B7A99"/><circle cx="8" cy="-10" r="24" fill="#5B7A99"/><circle cx="28" cy="4" r="15" fill="#5B7A99"/><rect x="-34" y="0" width="76" height="20" rx="10" fill="#5B7A99"/><g stroke="#5B7A99" stroke-width="5" stroke-linecap="round"><path d="M-14 36l-6 14M6 36l-6 14M26 36l-6 14"/></g></g><rect x="260" y="230" width="58" height="210" rx="10" fill="url(#lost)"/><text x="289" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#A8A4A0">40 L</text><text x="289" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">M</text><g transform="translate(289,120)"><circle cx="-16" cy="0" r="18" fill="#5B7A99"/><circle cx="8" cy="-10" r="24" fill="#5B7A99"/><circle cx="28" cy="4" r="15" fill="#5B7A99"/><rect x="-34" y="0" width="76" height="20" rx="10" fill="#5B7A99"/><g stroke="#5B7A99" stroke-width="5" stroke-linecap="round"><path d="M-14 36l-6 14M6 36l-6 14M26 36l-6 14"/></g></g><rect x="355" y="230" width="58" height="210" rx="10" fill="#F2EFEA"/><text x="384" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">40 L</text><text x="384" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">J</text><rect x="450" y="230" width="58" height="210" rx="10" fill="#F2EFEA"/><text x="479" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">40 L</text><text x="479" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">V</text><rect x="545" y="230" width="58" height="210" rx="10" fill="#F2EFEA"/><text x="574" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">40 L</text><text x="574" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">S</text><rect x="640" y="230" width="58" height="210" rx="10" fill="#F2EFEA"/><text x="669" y="214" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">40 L</text><text x="669" y="478" text-anchor="middle" font-size="24" fill="#A8A4A0">D</text>
+ <rect x="40" y="532" width="34" height="34" rx="6" fill="url(#lost)"/>
+ <text x="88" y="558" font-size="24" fill="#F2EFEA">2 arrosages sous la pluie : <tspan font-weight="700">80 L perdus</tspan></text>
+</svg></div>
+</div><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>2 / 7</span></div><aside>Membre 1 — 1 min
+Contexte (20 s) : à Cotonou et Abomey-Calavi, les places, boulevards et jardins publics sont entretenus par des agents qui arrosent à la main ou à heures fixes. En saison sèche, l'eau coûte cher ; en saison des pluies, on arrose souvent pour rien.
+Le problème incarné (40 s) : voici Afi, agente d'entretien à la Place des Amazones. Chaque matin, elle arrose tout le parc, même s'il a plu la nuit — sur cet exemple, deux arrosages sur sept tombent sous la pluie : 80 litres perdus pour une seule plante. Et elle donne la même dose à un baobab, qui a besoin de peu d'eau, qu'à un cocotier, qui en a besoin de beaucoup. Les arbres du fond, elle n'a pas le temps d'y aller : ce sont eux qui sèchent.
+Lire sa citation telle quelle.
+(Prénom, lieu et citation provisoires : à remplacer par ceux d'une vraie agente interrogée, avec sa photo et son accord.)
+Transition : « Comment fait-on aujourd'hui ? »</aside></section>
+<section class="slide " aria-label="Slide 3"><h2>Aucune méthode actuelle ne sait si la plante aura soif</h2>
+<div class="grid3">
+ <div class="card"><h3>Arroser à heures fixes</h3><div class="label">Ce qui manque</div><p class="txt">Arrose même après la pluie, la même dose pour chaque espèce</p></div>
+ <div class="card"><h3>La tournée de l'agent</h3><div class="label">Ce qui manque</div><p class="txt">Prend des heures, ne couvre pas tout, se juge à l'œil</p></div>
+ <div class="card"><h3>Le capteur à seuil fixe</h3><div class="label">Ce qui manque</div><p class="txt">Réagit quand la plante a déjà soif, sans voir la pluie qui arrive</p></div>
+</div><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>3 / 7</span></div><aside>Membre 2 — 40 s
+Aujourd'hui, trois façons d'arroser un espace vert.
+1. À heures fixes : on arrose même après la pluie, et chaque plante reçoit la même dose, quelle que soit son espèce.
+2. La tournée de l'agent : elle prend des heures, ne couvre jamais tout le parc, et on juge à l'œil.
+3. Le capteur avec un seuil fixe — c'était notre première version : il arrose quand le sol est déjà sec. Il réagit trop tard, et il ne sait pas qu'il va pleuvoir dans trois heures.
+Ce qui manque aux trois : anticiper. Savoir à l'avance quand chaque plante va avoir soif.
+Transition : « C'est exactement ce que fait notre IA. »</aside></section>
+<section class="slide " aria-label="Slide 4"><h2>Notre IA prévoit la soif avant qu'elle n'arrive</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;flex:1;align-items:center">
+ <div style="display:flex;flex-direction:column;gap:30px">
+  <div style="display:grid;grid-template-columns:68px 1fr;gap:24px;align-items:start"><div class="num">1</div><div><div class="txt" style="font-weight:700">Le capteur</div><p class="small mute">mesure l'humidité du sol toutes les 15 min, au solaire</p></div></div>
+  <div style="display:grid;grid-template-columns:68px 1fr;gap:24px;align-items:start"><div class="num">2</div><div><div class="txt" style="font-weight:700">Le modèle prévoit</div><p class="small mute">l'humidité des 24 h à venir : historique, météo, espèce</p></div></div>
+  <div style="display:grid;grid-template-columns:68px 1fr;gap:24px;align-items:start"><div class="num">3</div><div><div class="txt" style="font-weight:700">L'arrosage juste à temps</div><p class="small mute">la plus petite dose utile — ou rien si la pluie suffit</p></div></div>
+ </div>
+ <div><svg viewBox="0 0 820 520" width="100%" role="img" aria-label="Prévision de l'humidité du sol : le modèle prévoit que le neem passera sous son seuil dans 15 heures et planifie un arrosage de 18 litres dans 12 heures">
+ <rect width="820" height="520" rx="26" fill="#2A2A2A"/>
+ <text x="40" y="54" font-size="24" font-weight="700" fill="#F2EFEA">Neem UAC-001 · humidité du sol</text>
+ <g stroke="#3A3A3A" stroke-width="2"><line x1="90" y1="90" x2="780" y2="90"/><line x1="90" y1="255" x2="780" y2="255"/><line x1="90" y1="420" x2="780" y2="420"/></g>
+ <g font-size="18" fill="#A8A4A0" text-anchor="end"><text x="78" y="96">40 %</text><text x="78" y="261">25 %</text><text x="78" y="426">10 %</text></g>
+ <polygon points="435,233 521,243 608,255 694,274 780,288 780,350 694,320 608,286 521,258 435,233" fill="#3DBB6B" opacity=".16"/>
+ <line x1="90" y1="288" x2="780" y2="288" stroke="#A8A4A0" stroke-width="3" stroke-dasharray="10 10"/>
+ <text x="100" y="320" font-size="20" fill="#A8A4A0">seuil du neem : 22 %</text>
+ <polyline points="90,156 176,176 263,193 349,215 435,233" fill="none" stroke="#F2EFEA" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+ <polyline points="435,233 521,251 608,270 694,297 780,319" fill="none" stroke="#3DBB6B" stroke-width="6" stroke-dasharray="14 10" stroke-linecap="round" stroke-linejoin="round"/>
+ <line x1="435" y1="80" x2="435" y2="420" stroke="#555" stroke-width="2"/>
+ <circle cx="435" cy="233" r="9" fill="#F2EFEA"/>
+ <line x1="607.5" y1="110" x2="607.5" y2="270.4" stroke="#3DBB6B" stroke-width="3"/>
+ <circle cx="607.5" cy="270.4" r="10" fill="#3DBB6B"/>
+ <rect x="475.5" y="84" width="264" height="56" rx="12" fill="#3DBB6B"/>
+ <text x="607.5" y="120" text-anchor="middle" font-size="22" font-weight="800" fill="#1E1E1E">Arroser à +12 h · 18 L</text>
+ <g font-size="20" fill="#A8A4A0" text-anchor="middle"><text x="110" y="456">−24 h</text><text x="435" y="456" fill="#F2EFEA" font-weight="700">maintenant</text><text x="760" y="456">+24 h</text></g>
+ <g font-size="20" fill="#F2EFEA"><line x1="90" y1="492" x2="130" y2="492" stroke="#F2EFEA" stroke-width="6" stroke-linecap="round"/><text x="142" y="499">mesuré</text>
+ <line x1="260" y1="492" x2="300" y2="492" stroke="#3DBB6B" stroke-width="6" stroke-dasharray="12 8" stroke-linecap="round"/><text x="312" y="499">prévu par l'IA (± incertitude)</text></g>
+</svg></div>
+</div>
+<p class="task" style="padding-top:28px"><b>Tâche de l'IA :</b> pour chaque plante, prédire l'humidité du sol sur 24 h et choisir la plus petite dose qui la garde au-dessus du seuil de son espèce.</p><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>4 / 7</span></div><aside>Membre 2 — 1 min
+GreenTrack AI, c'est trois étapes.
+1. Au pied de chaque plante, un petit montage autonome : une sonde d'humidité du sol à 20 cm, un ESP32, un panneau solaire et une batterie. Il mesure toutes les 15 minutes.
+2. Un modèle prévoit l'humidité du sol pour les 24 prochaines heures. Il utilise l'historique de la plante, la prévision météo — chaleur, pluie — et l'espèce : un neem, un baobab ou un cocotier ne sèchent pas au même rythme.
+3. On arrose juste avant que la plante passe sous son seuil, avec la plus petite dose utile. Et si la pluie prévue suffit, on n'arrose pas.
+Montrer le graphique : en blanc, ce qui a été mesuré ; en vert, ce que prévoit l'IA. Le neem passera sous son seuil dans environ 15 heures : l'IA planifie 18 litres dans 12 heures.
+Transition (passer la parole) : « Notre coéquipier va vous montrer où c'est difficile. »</aside></section>
+<section class="slide " aria-label="Slide 5"><h2>Trois défis pour l'IA, trois réponses</h2>
+<div class="rows">
+ <div class="row"><div class="num">1</div><div class="pb">Des capteurs qui décrochent<small>9 sur 116 hors ligne sur le prototype</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Notre réponse</b>Estimer l'humidité à partir des plantes voisines et repérer les mesures aberrantes</div></div>
+ <div class="row"><div class="num">2</div><div class="pb">Peu d'historique par plante<small>une nouvelle plante n'a aucune donnée</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Notre réponse</b>Un modèle par espèce, ajusté plante par plante au fil des semaines</div></div>
+ <div class="row"><div class="num">3</div><div class="pb">Une météo incertaine<small>la pluie prévue ne tombe pas toujours</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Notre réponse</b>Décider selon la probabilité de pluie : attendre seulement si la plante peut tenir</div></div>
+</div><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>5 / 7</span></div><aside>Membre 3 — 50 s
+Trois défis, et c'est là qu'est le vrai travail d'IA.
+1. Les capteurs décrochent : au fond d'un parc, le signal passe mal. Sur le prototype, 9 capteurs sur 116 sont hors ligne. Plutôt que de laisser un trou, on estime l'humidité à partir des plantes voisines, et on repère les mesures aberrantes — un capteur cassé ne doit pas déclencher un arrosage.
+2. Une nouvelle plante n'a aucun historique. On part d'un modèle commun à son espèce, qu'on ajuste à cette plante précise au fil des semaines.
+3. La météo est incertaine. On ne parie pas sur la pluie : on attend seulement si la plante peut tenir même dans le cas où il ne pleut pas.
+Transition : « Voici où en est notre prototype. »</aside></section>
+<section class="slide " aria-label="Slide 6"><h2>Le prototype tourne déjà sur 6 espaces verts</h2>
+<div class="grid3" style="flex:0 0 auto">
+ <div class="card"><div class="stat">116</div><p class="txt mute">plantes suivies, du baobab au cocotier</p></div>
+ <div class="card"><div class="stat">93&nbsp;%</div><p class="txt mute">des arrosages faits sans intervention</p></div>
+ <div class="card"><div class="stat acc">−60&nbsp;%</div><p class="txt mute">d'eau face à un arrosage à heures fixes</p></div>
+</div>
+<p class="note-line">Données simulées du prototype. Prochaine étape : mesurer le gain de l'IA face au seuil fixe, sur un vrai site.</p><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>6 / 7</span></div><aside>Membre 3 — 30 s
+Notre prototype suit 116 plantes dans 6 espaces verts : Place des Amazones, Boulevard de la Marina, Place de l'Étoile Rouge, Jardin des Plantes et de la Nature, Forêt sacrée de Kpassè et Campus d'Abomey-Calavi.
+93 % des arrosages se font sans intervention humaine, et on utilise 60 % d'eau en moins qu'un arrosage à heures fixes.
+Être honnête avec le jury : ces chiffres viennent de données simulées. Notre prochaine étape, c'est de mesurer sur un vrai site ce que l'IA apporte en plus du simple seuil fixe.
+Transition : « Et après ? »</aside></section>
+<section class="slide " aria-label="Slide 7"><h2>Chaque plante devient un capteur de la ville</h2>
+<div class="later">
+ <div class="card"><div class="label" style="font-size:30px">Ce qu'on mesure sur le terrain</div><ul class="dots" style="margin-top:22px"><li>Litres d'eau économisés par mois</li><li>Temps passé par chaque plante dans sa zone de confort</li><li>Précision de la prévision à 24 h</li></ul></div>
+ <div class="tl">
+  <div class="step on"><div class="dot">1</div><div class="box"><div class="tag">Projet actuel</div><p>Un site pilote, 6 espaces verts</p></div></div>
+  <div class="step"><div class="dot">2</div><div class="box"><div class="tag">Ensuite</div><p>Tous les espaces verts de Cotonou et d'Abomey-Calavi</p></div></div>
+  <div class="step"><div class="dot">3</div><div class="box"><div class="tag">Vision</div><p>Des données pour la mairie : eau consommée et arbres en danger, parc par parc</p></div></div>
+ </div>
+</div><div class="foot"><span><b>GreenTrack AI</b> · Squad Nova</span><span>7 / 7</span></div><aside>Membre 4 — 40 s
+Sur le terrain, on mesure trois choses : les litres d'eau économisés chaque mois, le temps que chaque plante passe dans sa zone de confort, et la précision de notre prévision à 24 heures.
+Montrer la frise : aujourd'hui, un site pilote de 6 espaces verts — c'est l'étape 1. Ensuite, tous les espaces verts de Cotonou et d'Abomey-Calavi.
+À terme, GreenTrack AI devient une donnée précieuse pour la mairie : combien d'eau consomme chaque parc, et quels arbres sont en danger, repérés avant qu'ils ne meurent.
+Conclure : « Chaque plante devient un capteur de la ville. Merci, nous sommes prêts pour vos questions. »
+Répartition : M1 1 min 20 · M2 1 min 40 · M3 1 min 20 · M4 40 s = 5 min.</aside></section>
+<div class="progress"></div>
+</div>
+</main>
+<div class="controls" role="toolbar" aria-label="Navigation">
+<button data-a="prev" aria-label="Slide précédente">←</button>
+<span class="count" aria-live="polite"></span>
+<button data-a="next" aria-label="Slide suivante">→</button>
+<button data-a="notes" aria-label="Notes d'orateur (N)">Notes</button>
+<button data-a="fs" aria-label="Plein écran (F)">Plein écran</button>
+<a class="lang" href="greentrack-en.html" hreflang="en" lang="en" aria-label="English version">EN</a>
+</div>
+<div class="help">← → naviguer · N notes · F plein écran · L English · Ctrl+P exporter en PDF</div>
+<div class="notes" aria-label="Notes d'orateur">
+<header><span class="nidx"></span><span>Chrono <span class="timer">0:00</span> · T pour remettre à zéro</span></header>
+<div class="who-speaks"></div>
+<div class="ntext"></div>
+</div>
+<script>
+(function(){
+  const deck=document.querySelector('.deck');
+  const slides=[...document.querySelectorAll('.slide')];
+  const N=slides.length;
+  const prog=document.querySelector('.progress');
+  const count=document.querySelector('.count');
+  const nWho=document.querySelector('.who-speaks');
+  const nText=document.querySelector('.ntext');
+  const nIdx=document.querySelector('.nidx');
+  const vp=document.querySelector('.viewport');
+  let i=Math.min(N-1,Math.max(0,(parseInt(location.hash.slice(1),10)||1)-1));
+  function fit(){
+    const r=vp.getBoundingClientRect();
+    const pad=window.innerWidth<700?8:28;
+    const s=Math.min((r.width-pad*2)/1600,(r.height-pad*2)/900);
+    deck.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  function go(n){
+    i=Math.min(N-1,Math.max(0,n));
+    slides.forEach((s,k)=>{s.classList.toggle('active',k===i);s.classList.toggle('past',k<i);s.setAttribute('aria-hidden',k===i?'false':'true');});
+    prog.style.width=((i+1)/N*100)+'%';
+    count.textContent=(i+1)+' / '+N;
+    const a=slides[i].querySelector('aside');
+    const t=a?a.textContent.trim():'';
+    const lines=t.split('\n');
+    nWho.textContent=lines[0]||'';
+    nText.textContent=lines.slice(1).join('\n').trim();
+    nIdx.textContent='Slide '+(i+1)+' / '+N;
+    history.replaceState(null,'','#'+(i+1));
+  }
+  const next=()=>go(i+1), prev=()=>go(i-1);
+  function toggleNotes(){document.body.classList.toggle('notes-open');setTimeout(fit,320);}
+  function fs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  document.addEventListener('keydown',e=>{
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    const k=e.key;
+    if(['ArrowRight','PageDown',' ','Enter'].includes(k)){e.preventDefault();next();}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(k)){e.preventDefault();prev();}
+    else if(k==='Home')go(0); else if(k==='End')go(N-1);
+    else if(k==='n'||k==='N')toggleNotes();
+    else if(k==='f'||k==='F')fs();
+    else if(k==='t'||k==='T')t0=Date.now();
+    else if(k==='l'||k==='L'){const a=document.querySelector('a.lang');if(a)location.href=a.getAttribute('href').split('#')[0]+'#'+(i+1);}
+  });
+  document.querySelector('[data-a=prev]').onclick=prev;
+  document.querySelector('[data-a=next]').onclick=next;
+  document.querySelector('[data-a=notes]').onclick=toggleNotes;
+  document.querySelector('[data-a=fs]').onclick=fs;
+  let x0=null;
+  deck.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+  deck.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)(dx<0?next:prev)();x0=null;});
+  deck.addEventListener('click',e=>{if(e.target.closest('a,button'))return;const r=deck.getBoundingClientRect();(e.clientX>r.left+r.width*0.35?next:prev)();});
+  let idleT;function wake(){document.body.classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(()=>document.body.classList.add('idle'),2500);}
+  document.addEventListener('mousemove',wake);wake();
+  let t0=Date.now();const tm=document.querySelector('.timer');
+  setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);tm.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},500);
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',()=>{const n=(parseInt(location.hash.slice(1),10)||1)-1;if(n!==i)go(n);});
+  document.querySelectorAll('a.lang').forEach(a=>a.addEventListener('click',()=>{a.href=a.getAttribute('href').split('#')[0]+'#'+(i+1);}));
+  fit();go(i);
+})();
+</script>
+</body>
+</html>

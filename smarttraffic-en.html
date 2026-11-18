@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartTraffic AI</title>
+<meta name="description" content="Pitch SmartTraffic AI — the AI that predicts which streets are passable by motorbike in Cotonou. Team Squad Nova.">
+<link rel="alternate" hreflang="fr" href="smarttraffic.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1E1E1E;--card:#2A2A2A;--card2:#333333;--ink:#F2EFEA;--mute:#A8A4A0;--line:#4A4A4A;--acc:#E8572F;--shell:#121212}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--shell);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.viewport{position:fixed;left:0;right:0;top:0;bottom:0;transition:bottom .3s}
+body.notes-open .viewport{bottom:var(--notes-h)}
+.deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center center;background:var(--bg);overflow:hidden;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.slide{position:absolute;inset:0;padding:76px 96px 90px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateX(28px);transition:opacity .45s ease,transform .45s ease,visibility .45s}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-28px)}
+.slide h2{font-size:60px;line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 52px;max-width:1408px;text-wrap:balance}
+.slide .body{flex:1;min-height:0;display:flex;flex-direction:column}
+.foot{position:absolute;left:96px;right:96px;bottom:34px;display:flex;justify-content:space-between;font-size:20px;color:var(--mute);letter-spacing:.02em}
+.foot b{color:var(--ink);font-weight:600}
+.progress{position:absolute;left:0;bottom:0;height:5px;background:var(--acc);transition:width .45s ease}
+p{margin:0}
+.mute{color:var(--mute)} .acc{color:var(--acc)}
+.card{background:var(--card);border-radius:26px;padding:42px 44px;position:relative}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:36px;flex:1}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1}
+.card h3{font-size:40px;line-height:1.12;margin:0 0 18px;font-weight:700;letter-spacing:-.01em}
+.label{font-size:26px;font-weight:700;color:var(--acc);letter-spacing:.01em;margin-bottom:14px}
+.tag{font-size:22px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.txt{font-size:34px;line-height:1.3}
+.small{font-size:28px;line-height:1.35}
+.num{flex:none;width:68px;height:68px;border-radius:50%;background:var(--acc);color:#1E1E1E;font-weight:800;font-size:32px;display:grid;place-items:center}
+.task{margin-top:auto;padding-top:36px;font-size:36px;line-height:1.3;max-width:1380px}
+.task b{color:var(--acc)}
+/* title slide */
+.title-slide{justify-content:center;padding-top:60px}
+.title-slide h1{font-size:132px;line-height:1;margin:0 0 40px;font-weight:800;letter-spacing:-.045em}
+.title-slide h1 span{color:var(--acc)}
+.title-slide .lead{font-size:36px;line-height:1.4;color:var(--mute);max-width:960px}
+.title-slide .lead b{color:var(--ink);font-weight:600}
+.title-row{display:flex;align-items:center;gap:28px;margin-top:64px}
+.pill{background:var(--acc);color:#1E1E1E;font-weight:800;font-size:28px;padding:16px 34px;border-radius:99px}
+.team{font-size:32px;font-weight:600}
+.title-art{position:absolute;right:0;top:0;bottom:0;width:440px;opacity:.9;pointer-events:none}
+/* quote */
+.quote{font-size:48px;line-height:1.28;font-style:italic;font-weight:500;letter-spacing:-.01em}
+.quote .qm{color:var(--acc);font-style:normal;font-weight:800}
+.who{display:flex;align-items:center;gap:26px;margin-top:40px}
+.avatar{flex:none;width:120px;height:120px;border-radius:50%;border:3px dashed var(--line);display:grid;place-items:center;font-size:20px;color:var(--mute);text-align:center;line-height:1.2}
+.who .name{font-size:30px;font-weight:700}
+.who .role{font-size:26px;color:var(--mute)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;flex:1;align-items:center}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr;align-items:stretch}
+.pipe .card{display:flex;flex-direction:column;padding:28px 34px}
+.pipe .arrow{display:grid;place-items:center}
+.pipe svg.mini{width:100%;height:120px;margin:4px 0 14px}
+.pipe h3{font-size:36px;margin:0 0 10px}
+.pipe .small{color:var(--mute)}
+/* challenge rows */
+.rows{display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center}
+.row{display:grid;grid-template-columns:68px 1fr 60px 1.15fr;align-items:center;gap:30px;background:var(--card);border-radius:26px;padding:30px 40px}
+.row .pb{font-size:34px;font-weight:700;line-height:1.2}
+.row .pb small{display:block;font-size:26px;font-weight:400;color:var(--mute);margin-top:6px}
+.row .ans{font-size:30px;line-height:1.3}
+.row .ans b{color:var(--acc);display:block;font-size:22px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.heads{display:grid;grid-template-columns:68px 1fr 60px 1.15fr;gap:30px;padding:0 40px;margin-bottom:-6px}
+/* lists */
+ul.dots{list-style:none;padding:0;margin:0}
+ul.dots li{font-size:34px;line-height:1.3;padding-left:40px;position:relative;margin-bottom:22px}
+ul.dots li:before{content:"";position:absolute;left:4px;top:.5em;width:14px;height:14px;border-radius:50%;background:var(--acc)}
+ul.dots.off li{color:var(--mute)}
+ul.dots.off li:before{background:transparent;border:2px solid var(--line);top:.45em}
+/* stats */
+.stat{font-size:112px;white-space:nowrap;font-weight:800;letter-spacing:-.045em;line-height:1;margin-bottom:22px}
+.stat.acc{color:var(--acc)}
+.note-line{margin-top:30px;font-size:26px;color:var(--mute);font-style:italic}
+/* timeline */
+.later{display:grid;grid-template-columns:5fr 7fr;gap:52px;flex:1}
+.tl{position:relative;display:flex;flex-direction:column;gap:22px}
+.tl:before{content:"";position:absolute;left:33px;top:40px;bottom:60px;width:3px;background:var(--line)}
+.step{display:grid;grid-template-columns:68px 1fr;gap:28px;align-items:start;position:relative}
+.step .dot{width:68px;height:68px;border-radius:50%;border:3px solid var(--line);background:var(--bg);display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--mute)}
+.step .box{padding:20px 0}
+.step .box p{font-size:30px;line-height:1.3;color:var(--mute);margin-top:6px}
+.step.on .dot{background:var(--acc);border-color:var(--acc);color:#1E1E1E}
+.step.on .box{background:var(--card);border:3px solid var(--acc);border-radius:22px;padding:22px 30px}
+.step.on .tag{color:var(--acc)}
+.step.on .box p{color:var(--ink);font-weight:700;font-size:34px}
+/* chrome */
+.controls{position:fixed;right:20px;bottom:20px;display:flex;gap:8px;align-items:center;background:rgba(30,30,30,.92);border:1px solid #333;border-radius:14px;padding:6px;transition:opacity .3s,bottom .3s;z-index:5;font-size:15px}
+body.notes-open .controls{bottom:calc(var(--notes-h) + 20px)}
+body.idle .controls{opacity:0}
+.controls button{background:transparent;color:var(--ink);border:0;font:inherit;font-weight:600;padding:9px 13px;border-radius:9px;cursor:pointer}
+.controls button:hover,.controls button:focus-visible{background:#333;outline:none}
+.controls a.lang{color:var(--ink);text-decoration:none;font-weight:700;padding:9px 13px;border-radius:9px;border:1px solid #444}
+.controls a.lang:hover,.controls a.lang:focus-visible{background:#333;outline:none}
+.controls .count{color:var(--mute);min-width:56px;text-align:center;font-variant-numeric:tabular-nums}
+.notes{position:fixed;left:0;right:0;bottom:0;height:var(--notes-h);background:#181818;border-top:1px solid #333;transform:translateY(100%);transition:transform .3s;padding:18px 28px;overflow:auto;z-index:4}
+body.notes-open .notes{transform:none}
+.notes header{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.notes header .timer{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:0}
+.notes .who-speaks{color:var(--acc);font-weight:700;font-size:18px;margin-bottom:6px}
+.notes .ntext{font-size:18px;line-height:1.55;white-space:pre-line;max-width:1100px}
+.slide aside{display:none}
+.help{position:fixed;left:20px;bottom:20px;font-size:13px;color:#777;transition:opacity .3s;z-index:3}
+body.idle .help,body.notes-open .help{opacity:0}
+@media (prefers-reduced-motion:reduce){.slide,.progress,.viewport,.notes,.controls{transition:none}}
+@page{size:1600px 900px;margin:0}
+@media print{
+  html,body{overflow:visible;height:auto;background:var(--bg)}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .viewport{position:static}
+  .deck{position:static;transform:none!important;width:1600px;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;height:900px;break-after:page;transition:none}
+  .controls,.notes,.progress,.help{display:none}
+}
+</style>
+<style>:root{--notes-h:34vh}</style>
+</head>
+<body>
+<main class="viewport">
+<div class="deck" role="region" aria-roledescription="presentation" aria-label="SmartTraffic AI">
+<section class="slide title-slide" aria-label="Slide 1"><svg class="title-art" viewBox="0 0 640 900" aria-hidden="true">
+ <g stroke="#2E2E2E" stroke-width="14" stroke-linecap="round" fill="none">
+  <path d="M80 0V900M300 0V900M520 0V900M0 180H640M0 420H640M0 660H640"/>
+  <path d="M300 420L520 180" stroke-width="9"/>
+ </g>
+ <path d="M80 820V660H300V420L520 180V60" fill="none" stroke="#E8572F" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle cx="80" cy="820" r="20" fill="#E8572F"/><circle cx="520" cy="60" r="20" fill="#F2EFEA"/>
+ <g fill="#F2EFEA" opacity=".55"><circle cx="92" cy="700" r="5"/><circle cx="70" cy="742" r="5"/><circle cx="150" cy="672" r="5"/><circle cx="236" cy="648" r="5"/><circle cx="312" cy="560" r="5"/><circle cx="288" cy="480" r="5"/><circle cx="370" cy="352" r="5"/><circle cx="452" cy="262" r="5"/><circle cx="530" cy="128" r="5"/></g>
+</svg>
+<h1>SmartTraffic <span>AI</span></h1>
+<p class="lead">In Cotonou, motorbike couriers lose time every day because Google Maps knows <b>neither their shortcuts nor the flooded streets</b>. We're building the AI that learns from delivery fleets' real trips to predict <b>which roads are passable</b> and <b>how long they really take</b>.</p>
+<div class="title-row"><span class="pill">Solution Track</span><span class="team">Team Squad Nova</span></div><aside>Member 1 — 20 s
+Hello, we are team Squad Nova. Our project is called SmartTraffic AI, in the Solution track.
+Read the central sentence slowly, looking at the jury.
+Transition: “Let us introduce you to Koffi.”</aside></section>
+<section class="slide " aria-label="Slide 2"><h2>In Cotonou, rain makes motorbike deliveries fail</h2>
+<div class="split">
+ <div>
+  <p class="quote"><span class="qm">“</span>When it rains, Google Maps sends me down flooded streets. I lose a delivery with every detour.<span class="qm">”</span></p>
+  <div class="who"><div class="avatar">photo<br>coming soon</div><div><div class="name">Koffi, motorbike courier</div><div class="role">3 years delivering in Cotonou</div></div></div>
+ </div>
+ <div><svg viewBox="0 0 760 600" width="100%" role="img" aria-label="Map: the Google Maps route crosses a flooded street, the real trip takes a detour">
+ <defs><pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#3E5568"/><line x1="0" y1="0" x2="0" y2="14" stroke="#5B7A99" stroke-width="6"/></pattern></defs>
+ <rect width="760" height="600" rx="26" fill="#2A2A2A"/>
+ <g stroke="#3C3C3C" stroke-width="16" stroke-linecap="round" fill="none">
+  <path d="M110 40V500M300 40V500M480 40V500M650 40V500M60 110H700M60 260H700M60 400H700"/>
+  <path d="M300 400L480 260" stroke-width="9"/>
+ </g>
+ <ellipse cx="392" cy="260" rx="96" ry="56" fill="url(#hatch)" opacity=".9"/>
+ <text x="392" y="196" text-anchor="middle" font-size="22" font-weight="700" fill="#9FB7CC">Flooded street</text>
+ <path d="M110 470V260H650V110" fill="none" stroke="#F2EFEA" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M110 470V260H318" fill="none" stroke="#E8572F" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M300 260V400H480V110H650" fill="none" stroke="#E8572F" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+ <g stroke="#F2EFEA" stroke-width="6" stroke-linecap="round"><path d="M318 244l22 32M340 244l-22 32"/></g>
+ <circle cx="110" cy="470" r="18" fill="#E8572F"/><text x="110" y="528" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">Akpakpa</text>
+ <circle cx="650" cy="110" r="18" fill="#F2EFEA"/><text x="650" y="70" text-anchor="middle" font-size="22" font-weight="700" fill="#F2EFEA">Cadjèhoun</text>
+ <g font-size="22" fill="#F2EFEA">
+  <line x1="40" y1="566" x2="90" y2="566" stroke="#F2EFEA" stroke-width="6" stroke-dasharray="4 12" stroke-linecap="round"/>
+  <text x="102" y="573">Google Maps: <tspan font-weight="700">15 min</tspan></text>
+  <line x1="390" y1="566" x2="440" y2="566" stroke="#E8572F" stroke-width="9" stroke-linecap="round"/>
+  <text x="452" y="573">Real trip: <tspan font-weight="700" fill="#E8572F">40 min</tspan></text>
+ </g>
+</svg></div>
+</div><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>2 / 7</span></div><aside>Member 1 — 1 min 10
+Context (20 s): in Cotonou, deliveries are made by motorbike — meals, parcels, groceries. The sector is growing fast with delivery apps. And during the rainy season, entire streets become impassable within a few hours.
+The problem, through a person (50 s): this is Koffi, a courier for 3 years. On a rainy day, he has to go from Akpakpa to Cadjèhoun. Google Maps says 15 minutes and sends him straight ahead. He runs into a flooded street, turns back, looks for another way. He arrives after 40 minutes. The customer is unhappy, and Koffi has lost a delivery.
+Read his quote as is.
+(Quote, first name and durations are placeholders: replace them with those of a real courier you interviewed, with their photo and consent.)
+Transition: “How do they manage today?”</aside></section>
+<section class="slide " aria-label="Slide 3"><h2>No current tool knows which street is passable</h2>
+<div class="grid3">
+ <div class="card"><h3>Google Maps</h3><div class="label">What's missing</div><p class="txt">Built for cars: ignores motorbike shortcuts and flooded streets</p></div>
+ <div class="card"><h3>The courier's memory</h3><div class="label">What's missing</div><p class="txt">Stays in their head: can't be shared, doesn't cover the whole city</p></div>
+ <div class="card"><h3>Calling the customer</h3><div class="label">What's missing</div><p class="txt">Wastes time and says nothing about the state of the road</p></div>
+</div><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>3 / 7</span></div><aside>Member 2 — 40 s
+Today, a courier has three options.
+1. Google Maps: built for cars, it ignores the shortcuts motorbikes take and doesn't know a street is under water.
+2. Their own memory: very precise, but it can't be shared. A new courier, an unfamiliar neighbourhood, and it's no longer useful.
+3. Calling the customer: it helps find the address, not to know whether the road is passable.
+What all three lack: knowledge of the real street, up to date and shared.
+Transition: “That knowledge already exists — in the fleets' trips.”</aside></section>
+<section class="slide " aria-label="Slide 4"><h2>Our AI learns the real city from real trips</h2>
+<div class="pipe">
+ <div class="card"><div class="num">1</div><svg class="mini" viewBox="0 0 300 150" aria-hidden="true">
+ <path d="M10 120 L120 120 L200 40 L290 40" fill="none" stroke="#444" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+ <g fill="#F2EFEA"><circle cx="22" cy="112" r="5"/><circle cx="48" cy="132" r="5"/><circle cx="76" cy="108" r="5"/><circle cx="104" cy="96" r="5"/><circle cx="128" cy="134" r="5"/><circle cx="150" cy="84" r="5"/><circle cx="182" cy="70" r="5"/><circle cx="196" cy="22" r="5"/><circle cx="232" cy="52" r="5"/><circle cx="262" cy="28" r="5"/><circle cx="284" cy="54" r="5"/></g>
+ <circle cx="70" cy="56" r="6" fill="none" stroke="#E8572F" stroke-width="3"/><circle cx="238" cy="106" r="6" fill="none" stroke="#E8572F" stroke-width="3"/>
+</svg><h3>GPS traces</h3><p class="small">from the fleet's phones, snapped to the right street</p></div>
+ <div class="arrow"><svg width="56" height="40" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#E8572F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="card"><div class="num">2</div><svg class="mini" viewBox="0 0 300 150" aria-hidden="true">
+ <g stroke-width="10" stroke-linecap="round">
+  <path d="M30 30H150" stroke="#F2EFEA"/><path d="M150 30H270" stroke="#E8572F"/>
+  <path d="M30 30V120" stroke="#F2EFEA"/><path d="M150 30V120" stroke="#555" stroke-dasharray="2 16"/>
+  <path d="M270 30V120" stroke="#F2EFEA"/><path d="M30 120H150" stroke="#E8572F"/><path d="M150 120H270" stroke="#F2EFEA"/>
+ </g>
+ <g fill="#1E1E1E" stroke="#A8A4A0" stroke-width="3"><circle cx="30" cy="30" r="9"/><circle cx="150" cy="30" r="9"/><circle cx="270" cy="30" r="9"/><circle cx="30" cy="120" r="9"/><circle cx="150" cy="120" r="9"/><circle cx="270" cy="120" r="9"/></g>
+ <text x="162" y="82" font-size="18" fill="#A8A4A0">flooded</text>
+</svg><h3>The model</h3><p class="small">learns, street by street, whether you can get through and how fast</p></div>
+ <div class="arrow"><svg width="56" height="40" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#E8572F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="card"><div class="num">3</div><svg class="mini" viewBox="0 0 300 150" aria-hidden="true">
+ <rect x="20" y="8" width="260" height="134" rx="16" fill="#1E1E1E"/>
+ <text x="44" y="44" font-size="18" fill="#A8A4A0">Delivery #128</text>
+ <text x="44" y="100" font-size="46" font-weight="800" fill="#F2EFEA">23 min</text>
+ <text x="236" y="100" font-size="22" fill="#E8572F" font-weight="700">± 4</text>
+ <rect x="44" y="116" width="212" height="8" rx="4" fill="#3A3A3A"/><rect x="44" y="116" width="140" height="8" rx="4" fill="#E8572F"/>
+</svg><h3>The dashboard</h3><p class="small">predicted delivery time and streets to avoid</p></div>
+</div>
+<p class="task"><b>The AI's task:</b> for each street segment and each 15-minute slot, predict whether it is passable by motorbike and how long it takes to cross.</p><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>4 / 7</span></div><aside>Member 2 — 1 min
+Our solution comes down to three steps.
+1. We collect GPS traces from the phones of a partner fleet's couriers — they're already riding all day. We snap each point to the right street.
+2. A model learns two things, segment by segment: are motorbikes getting through right now, and how fast. If no motorbike goes down a street anymore right after a downpour, that's a strong signal.
+3. The fleet manager sees this on a dashboard: a realistic delivery time, with a margin of error, and the streets to avoid.
+Stress the bottom line: the exact task of the AI. The time of a delivery is the sum of the predicted times on each segment of the route.
+Transition (hand over): “Our teammate will show you where it gets hard.”</aside></section>
+<section class="slide " aria-label="Slide 5"><h2>Three challenges for the AI, three answers</h2>
+<div class="rows">
+ <div class="row"><div class="num">1</div><div class="pb">Noisy GPS<small>entry-level phones</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Our answer</b>Snap each trace to the most likely path in the street network</div></div>
+ <div class="row"><div class="num">2</div><div class="pb">Little data per alley<small>a few passes a day</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Our answer</b>Share what we learn between neighbouring streets and similar streets</div></div>
+ <div class="row"><div class="num">3</div><div class="pb">Streets that change with the rain<small>passable in the morning, flooded at night</small></div><svg width="48" height="34" viewBox="0 0 56 40" aria-hidden="true"><path d="M4 20h40M32 8l14 12-14 12" fill="none" stroke="#5A5A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="ans"><b>Our answer</b>Spot live the streets motorbikes avoid, cross-checked with measured rainfall</div></div>
+</div><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>5 / 7</span></div><aside>Member 3 — 50 s
+Three challenges, and this is where the real AI work is.
+1. GPS: couriers have entry-level phones. The position jumps, sometimes from one street to the next. We snap each trace to the most likely path in the street network — this is called map-matching.
+2. Volume: main roads get lots of traffic, some alleys very little. The model treats the city as a graph: a rarely used alley learns from its neighbours and from streets that look like it.
+3. Rain: a street that's passable in the morning can be flooded in the afternoon. We don't settle for an average: we detect live the streets motorbikes start avoiding, and cross-check with measured rainfall.
+Transition: “To get there, we chose a very tight scope.”</aside></section>
+<section class="slide " aria-label="Slide 6"><h2>The MVP: one fleet, one city, motorbikes</h2>
+<div class="grid2">
+ <div class="card"><h3 class="acc">We do</h3><ul class="dots"><li>Dashboard for one fleet</li><li>Predicted time for every delivery</li><li>Cotonou, motorbikes only</li></ul></div>
+ <div class="card"><h3 class="mute">We don't do</h3><ul class="dots off"><li>Consumer app</li><li>Cars</li><li>Other cities</li><li>Payments</li></ul></div>
+</div><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>6 / 7</span></div><aside>Member 4 — 30 s
+Our MVP is a dashboard for one delivery fleet and a predicted time for every delivery. One city, Cotonou, and motorbikes only.
+What we don't do: no consumer app, no cars, no other cities, no payments. It's not a lack of ambition: it's what lets us deliver something that works.
+Transition: “And next?”</aside></section>
+<section class="slide " aria-label="Slide 7"><h2>Every courier on the road measures the city</h2>
+<div class="later">
+ <div class="card"><div class="label" style="font-size:30px">What we measure during the EIP</div><ul class="dots" style="margin-top:22px"><li>Minutes saved per delivery</li><li>Predicted vs. actual gap, compared to Google Maps</li><li>Active couriers each week</li></ul></div>
+ <div class="tl">
+  <div class="step on"><div class="dot">1</div><div class="box"><div class="tag">EIP project</div><p>One delivery fleet</p></div></div>
+  <div class="step"><div class="dot">2</div><div class="box"><div class="tag">After the EIP</div><p>Several fleets (delivery, motorbike taxis) covering the whole city</p></div></div>
+  <div class="step"><div class="dot">3</div><div class="box"><div class="tag">Vision</div><p>Cotonou's first traffic info designed for motorbikes, and data for the city council</p></div></div>
+ </div>
+</div><div class="foot"><span><b>SmartTraffic AI</b> · Squad Nova</span><span>7 / 7</span></div><aside>Member 4 — 30 s
+During the EIP, we measure three things: minutes saved per delivery, the gap between predicted and actual time compared to Google Maps, and the number of active couriers each week.
+Show the timeline: during the EIP, a single fleet — that's step 1, and only step 1. Then, other fleets — delivery, motorbike taxis — cover the whole city.
+“With several fleets, our map becomes Cotonou's first traffic information designed for motorbikes, and valuable data for the city council: where traffic jams form, and which streets become impassable every rainy season.”
+Close: “Every courier on the road measures the city. Thank you, we're ready for your questions.”
+Split: M1 1 min 30 · M2 1 min 40 · M3 50 s · M4 1 min = 5 min.</aside></section>
+<div class="progress"></div>
+</div>
+</main>
+<div class="controls" role="toolbar" aria-label="Navigation">
+<button data-a="prev" aria-label="Previous slide">←</button>
+<span class="count" aria-live="polite"></span>
+<button data-a="next" aria-label="Next slide">→</button>
+<button data-a="notes" aria-label="Speaker notes (N)">Notes</button>
+<button data-a="fs" aria-label="Fullscreen (F)">Fullscreen</button>
+<a class="lang" href="smarttraffic.html" hreflang="fr" lang="fr" aria-label="Version française">FR</a>
+</div>
+<div class="help">← → navigate · N notes · F fullscreen · L Français · Ctrl+P export to PDF</div>
+<div class="notes" aria-label="Speaker notes">
+<header><span class="nidx"></span><span>Timer <span class="timer">0:00</span> · T to reset</span></header>
+<div class="who-speaks"></div>
+<div class="ntext"></div>
+</div>
+<script>
+(function(){
+  const deck=document.querySelector('.deck');
+  const slides=[...document.querySelectorAll('.slide')];
+  const N=slides.length;
+  const prog=document.querySelector('.progress');
+  const count=document.querySelector('.count');
+  const nWho=document.querySelector('.who-speaks');
+  const nText=document.querySelector('.ntext');
+  const nIdx=document.querySelector('.nidx');
+  const vp=document.querySelector('.viewport');
+  let i=Math.min(N-1,Math.max(0,(parseInt(location.hash.slice(1),10)||1)-1));
+  function fit(){
+    const r=vp.getBoundingClientRect();
+    const pad=window.innerWidth<700?8:28;
+    const s=Math.min((r.width-pad*2)/1600,(r.height-pad*2)/900);
+    deck.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  function go(n){
+    i=Math.min(N-1,Math.max(0,n));
+    slides.forEach((s,k)=>{s.classList.toggle('active',k===i);s.classList.toggle('past',k<i);s.setAttribute('aria-hidden',k===i?'false':'true');});
+    prog.style.width=((i+1)/N*100)+'%';
+    count.textContent=(i+1)+' / '+N;
+    const a=slides[i].querySelector('aside');
+    const t=a?a.textContent.trim():'';
+    const lines=t.split('\n');
+    nWho.textContent=lines[0]||'';
+    nText.textContent=lines.slice(1).join('\n').trim();
+    nIdx.textContent='Slide '+(i+1)+' / '+N;
+    history.replaceState(null,'','#'+(i+1));
+  }
+  const next=()=>go(i+1), prev=()=>go(i-1);
+  function toggleNotes(){document.body.classList.toggle('notes-open');setTimeout(fit,320);}
+  function fs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  document.addEventListener('keydown',e=>{
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    const k=e.key;
+    if(['ArrowRight','PageDown',' ','Enter'].includes(k)){e.preventDefault();next();}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(k)){e.preventDefault();prev();}
+    else if(k==='Home')go(0); else if(k==='End')go(N-1);
+    else if(k==='n'||k==='N')toggleNotes();
+    else if(k==='f'||k==='F')fs();
+    else if(k==='t'||k==='T')t0=Date.now();
+    else if(k==='l'||k==='L'){const a=document.querySelector('a.lang');if(a)location.href=a.getAttribute('href').split('#')[0]+'#'+(i+1);}
+  });
+  document.querySelector('[data-a=prev]').onclick=prev;
+  document.querySelector('[data-a=next]').onclick=next;
+  document.querySelector('[data-a=notes]').onclick=toggleNotes;
+  document.querySelector('[data-a=fs]').onclick=fs;
+  let x0=null;
+  deck.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+  deck.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)(dx<0?next:prev)();x0=null;});
+  deck.addEventListener('click',e=>{if(e.target.closest('a,button'))return;const r=deck.getBoundingClientRect();(e.clientX>r.left+r.width*0.35?next:prev)();});
+  let idleT;function wake(){document.body.classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(()=>document.body.classList.add('idle'),2500);}
+  document.addEventListener('mousemove',wake);wake();
+  let t0=Date.now();const tm=document.querySelector('.timer');
+  setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);tm.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},500);
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',()=>{const n=(parseInt(location.hash.slice(1),10)||1)-1;if(n!==i)go(n);});
+  document.querySelectorAll('a.lang').forEach(a=>a.addEventListener('click',()=>{a.href=a.getAttribute('href').split('#')[0]+'#'+(i+1);}));
+  fit();go(i);
+})();
+</script>
+</body>
+</html>
